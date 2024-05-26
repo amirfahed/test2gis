@@ -11,11 +11,9 @@ package main
 
 import (
 	"applicationDesignTest/config"
-	"applicationDesignTest/internal/handlers"
+	"applicationDesignTest/internal/router"
 	"errors"
 	"fmt"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"log"
 	"net/http"
 	"os"
@@ -24,22 +22,11 @@ import (
 func main() {
 	log.Println("Start server")
 	conf, _ := config.New()
-	err := http.ListenAndServe(fmt.Sprintf("%s:%s", conf.Host, conf.Port), getRouter())
+	err := http.ListenAndServe(fmt.Sprintf("%s:%s", conf.Host, conf.Port), router.GetRouter())
 	if errors.Is(err, http.ErrServerClosed) {
 		log.Println("Server closed")
 	} else if err != nil {
 		log.Fatalf("Server error: %s", err)
 		os.Exit(1)
 	}
-}
-
-func getRouter() *chi.Mux {
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-
-	r.Route("/orders", func(r chi.Router) {
-		r.Post("/", handlers.CreateOrder)
-	})
-
-	return r
 }

@@ -8,3 +8,7 @@ type RoomAvailability struct {
 	Date    time.Time `json:"date"`
 	Quota   int       `json:"quota"`
 }
+
+func (hotel *RoomAvailability) IsEqualRoom(roomAvailability RoomAvailability) bool {
+	return hotel.HotelID == roomAvailability.HotelID && hotel.RoomID == roomAvailability.RoomID && hotel.Date == roomAvailability.Date
+}
