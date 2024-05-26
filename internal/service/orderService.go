@@ -58,7 +58,7 @@ func (o *OrderService) CreateOrder(ctx context.Context, newOrder models.Order) (
 		return false, nil
 	}
 
-	err = o.orderRepo.CreateOrder(ctx, []models.Order{newOrder})
+	err = o.orderRepo.CreateOrders(ctx, []models.Order{newOrder})
 	if err != nil {
 		return false, nil
 	}

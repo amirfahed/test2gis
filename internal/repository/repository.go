@@ -6,7 +6,7 @@ import (
 )
 
 type OrderRepo interface {
-	CreateOrder(ctx context.Context, orders []models.Order) error
+	CreateOrders(ctx context.Context, orders []models.Order) error
 }
 
 type HotelRepo interface {

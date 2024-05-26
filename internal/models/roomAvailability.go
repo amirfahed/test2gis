@@ -10,5 +10,5 @@ type RoomAvailability struct {
 }
 
 func (hotel *RoomAvailability) IsEqualRoom(roomAvailability RoomAvailability) bool {
-	return hotel.HotelID == roomAvailability.HotelID && hotel.RoomID == roomAvailability.RoomID && hotel.Date == roomAvailability.Date
+	return hotel.HotelID == roomAvailability.HotelID && hotel.RoomID == roomAvailability.RoomID && hotel.Date.Equal(roomAvailability.Date)
 }
