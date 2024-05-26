@@ -20,7 +20,7 @@ import (
 )
 
 func main() {
-	logger.LogInfo("Server listening on localhost:8080")
+	logger.LogInfo("Start server")
 	conf, _ := config.New()
 	err := http.ListenAndServe(fmt.Sprintf("%s:%s", conf.Host, conf.Port), router.GetRouter())
 	if errors.Is(err, http.ErrServerClosed) {
