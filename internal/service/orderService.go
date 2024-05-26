@@ -6,7 +6,6 @@ import (
 	"applicationDesignTest/internal/utils/helpers"
 	"applicationDesignTest/internal/utils/logger"
 	"context"
-	"fmt"
 	"time"
 )
 
@@ -32,14 +31,16 @@ func (o *OrderService) CreateOrder(ctx context.Context, newOrder models.Order) (
 
 	availability, err := o.hotelRepo.GetRoomAvailability(ctx)
 	if err != nil {
-		logger.LogErrorf(err.Error()) //???
-		_ = fmt.Errorf("GetRoomAvailability problem")
+		logger.LogErrorf(err.Error())
 	}
 
 	var availabilityToUpdate []models.RoomAvailability
 	for _, dayToBook := range daysToBook {
 		for _, availability := range availability {
-			if !availability.Date.Equal(dayToBook) || availability.Quota < 1 {
+			if !availability.Date.Equal(dayToBook) ||
+				availability.Quota < 1 ||
+				availability.HotelID != newOrder.HotelID ||
+				availability.RoomID != newOrder.RoomID {
 				continue
 			}
 			availability.Quota -= 1

@@ -12,21 +12,21 @@ package main
 import (
 	"applicationDesignTest/config"
 	"applicationDesignTest/internal/router"
+	"applicationDesignTest/internal/utils/logger"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 )
 
 func main() {
-	log.Println("Start server")
+	logger.LogInfo("Server listening on localhost:8080")
 	conf, _ := config.New()
 	err := http.ListenAndServe(fmt.Sprintf("%s:%s", conf.Host, conf.Port), router.GetRouter())
 	if errors.Is(err, http.ErrServerClosed) {
-		log.Println("Server closed")
+		logger.LogInfo("Server closed")
 	} else if err != nil {
-		log.Fatalf("Server error: %s", err)
+		logger.LogErrorf("Server error: %s", err)
 		os.Exit(1)
 	}
 }
