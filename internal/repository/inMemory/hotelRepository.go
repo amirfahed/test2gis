@@ -27,11 +27,14 @@ func (hotel *HotelRepository) GetRoomAvailability(ctx context.Context) ([]models
 	return hotel.roomAvailabilities, nil
 }
 
-func (hotel *HotelRepository) UpdateRoomAvailability(ctx context.Context, updatedRoom models.RoomAvailability) error {
-	for _, roomAvailability := range hotel.roomAvailabilities {
-		if roomAvailability.IsEqualRoom(updatedRoom) {
-			roomAvailability = updatedRoom
+func (hotel *HotelRepository) UpdateRoomAvailability(ctx context.Context, updatedRooms []models.RoomAvailability) error {
+	for _, updatedRoom := range updatedRooms {
+		for _, roomAvailability := range hotel.roomAvailabilities {
+			if roomAvailability.IsEqualRoom(updatedRoom) {
+				roomAvailability = updatedRoom
+			}
 		}
 	}
+
 	return nil
 }

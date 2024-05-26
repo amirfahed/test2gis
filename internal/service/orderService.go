@@ -2,27 +2,24 @@ package service
 
 import (
 	"applicationDesignTest/internal/models"
+	"applicationDesignTest/internal/repository"
 	"applicationDesignTest/internal/utils/helpers"
+	"applicationDesignTest/internal/utils/logger"
 	"context"
+	"fmt"
 	"time"
 )
 
-var Orders = []models.Order{}
-var Availability = []models.RoomAvailability{
-	{"reddison", "lux", helpers.Date(2024, 1, 1), 1},
-	{"reddison", "lux", helpers.Date(2024, 1, 2), 1},
-	{"reddison", "lux", helpers.Date(2024, 1, 3), 1},
-	{"reddison", "lux", helpers.Date(2024, 1, 4), 1},
-	{"reddison", "lux", helpers.Date(2024, 1, 5), 0},
-}
-
 type OrderService struct {
-	//repoOrder := orderRepo.NewOrderRepo()
-	//repoRoom := roomRepo.NewRoomRepo()
+	orderRepo repository.OrderRepo
+	hotelRepo repository.HotelRepo
 }
 
-func NewOrderService() *OrderService {
-	return &OrderService{}
+func NewOrderService(orderRepo repository.OrderRepo, hotelRepo repository.HotelRepo) *OrderService {
+	return &OrderService{
+		orderRepo: orderRepo,
+		hotelRepo: hotelRepo,
+	}
 }
 
 func (o *OrderService) CreateOrder(ctx context.Context, newOrder models.Order) (bool, map[time.Time]struct{}) {
@@ -33,13 +30,20 @@ func (o *OrderService) CreateOrder(ctx context.Context, newOrder models.Order) (
 		unavailableDays[day] = struct{}{}
 	}
 
+	availability, err := o.hotelRepo.GetRoomAvailability(ctx)
+	if err != nil {
+		logger.LogErrorf(err.Error()) //???
+		_ = fmt.Errorf("GetRoomAvailability problem")
+	}
+
+	var availabilityToUpdate []models.RoomAvailability
 	for _, dayToBook := range daysToBook {
-		for i, availability := range Availability {
+		for _, availability := range availability {
 			if !availability.Date.Equal(dayToBook) || availability.Quota < 1 {
 				continue
 			}
 			availability.Quota -= 1
-			Availability[i] = availability
+			availabilityToUpdate = append(availabilityToUpdate, availability)
 			delete(unavailableDays, dayToBook)
 		}
 	}
@@ -48,6 +52,21 @@ func (o *OrderService) CreateOrder(ctx context.Context, newOrder models.Order) (
 		return false, unavailableDays
 	}
 
-	Orders = append(Orders, newOrder)
+	err = o.hotelRepo.UpdateRoomAvailability(ctx, availabilityToUpdate)
+	if err != nil {
+		logger.LogErrorf(err.Error())
+		return false, nil
+	}
+
+	err = o.orderRepo.CreateOrder(ctx, []models.Order{newOrder})
+	if err != nil {
+		return false, nil
+	}
+
+	if err != nil {
+		logger.LogErrorf(err.Error())
+		return false, nil
+	}
+
 	return true, nil
 }
