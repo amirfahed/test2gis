@@ -10,16 +10,30 @@
 package main
 
 import (
+	"applicationDesignTest/config"
+	"applicationDesignTest/internal/handlers"
 	"errors"
+	"fmt"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"log"
 	"net/http"
 	"os"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"applicationDesignTest/internal/handlers"
 )
 
 func main() {
+	log.Println("Start server")
+	conf, _ := config.New()
+	err := http.ListenAndServe(fmt.Sprintf("%s:%s", conf.Host, conf.Port), getRouter())
+	if errors.Is(err, http.ErrServerClosed) {
+		log.Println("Server closed")
+	} else if err != nil {
+		log.Fatalf("Server error: %s", err)
+		os.Exit(1)
+	}
+}
+
+func getRouter() *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
@@ -27,12 +41,5 @@ func main() {
 		r.Post("/", handlers.CreateOrder)
 	})
 
-	log.Println("Сервер слушает на localhost:8080")
-	err := http.ListenAndServe(":8080", r)
-	if errors.Is(err, http.ErrServerClosed) {
-		log.Println("Сервер закрыт")
-	} else if err != nil {
-		log.Fatalf("Ошибка сервера: %s", err)
-		os.Exit(1)
-	}
+	return r
 }
