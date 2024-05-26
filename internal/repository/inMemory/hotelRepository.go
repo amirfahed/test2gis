@@ -13,10 +13,12 @@ type HotelRepository struct {
 func NewHotelRepository() *HotelRepository {
 	initialRooms := []models.RoomAvailability{
 		{"reddison", "lux", helpers.Date(2024, 1, 1), 1},
-		{"reddison", "lux", helpers.Date(2024, 1, 2), 1},
+		//{"reddison", "lux", helpers.Date(2024, 1, 2), 1},
 		{"reddison", "lux", helpers.Date(2024, 1, 3), 1},
 		{"reddison", "lux", helpers.Date(2024, 1, 4), 1},
 		{"reddison", "lux", helpers.Date(2024, 1, 5), 0},
+
+		//{"reddison", "nonlux", helpers.Date(2024, 1, 2), 1},
 	}
 	return &HotelRepository{
 		roomAvailabilities: initialRooms,
@@ -29,9 +31,9 @@ func (hotel *HotelRepository) GetRoomAvailability(ctx context.Context) ([]models
 
 func (hotel *HotelRepository) UpdateRoomAvailability(ctx context.Context, updatedRooms []models.RoomAvailability) error {
 	for _, updatedRoom := range updatedRooms {
-		for _, roomAvailability := range hotel.roomAvailabilities {
+		for i, roomAvailability := range hotel.roomAvailabilities {
 			if roomAvailability.IsEqualRoom(updatedRoom) {
-				roomAvailability = updatedRoom
+				hotel.roomAvailabilities[i] = updatedRoom
 			}
 		}
 	}
