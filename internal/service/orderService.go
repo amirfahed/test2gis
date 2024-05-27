@@ -29,24 +29,25 @@ func (o *OrderService) CreateOrder(ctx context.Context, newOrder models.Order) (
 		unavailableDays[day] = struct{}{}
 	}
 
-	availability, err := o.hotelRepo.GetRoomAvailability(ctx)
+	availabilities, err := o.hotelRepo.GetRoomAvailability(ctx)
 	if err != nil {
 		logger.LogErrorf(err.Error())
 	}
 
 	var availabilityToUpdate []models.RoomAvailability
-	for _, dayToBook := range daysToBook {
-		for _, availability := range availability {
-			if !availability.Date.Equal(dayToBook) ||
-				availability.Quota < 1 ||
-				availability.HotelID != newOrder.HotelID ||
-				availability.RoomID != newOrder.RoomID {
-				continue
-			}
-			availability.Quota -= 1
-			availabilityToUpdate = append(availabilityToUpdate, availability)
-			delete(unavailableDays, dayToBook)
+
+	// optimization 2 for
+	for i, availability := range availabilities {
+		_, ok := unavailableDays[availability.Date]
+		if !ok ||
+			availability.Quota < 1 ||
+			availability.HotelID != newOrder.HotelID ||
+			availability.RoomID != newOrder.RoomID {
+			continue
 		}
+		availabilities[i].Quota -= 1
+		availabilityToUpdate = append(availabilityToUpdate, availability)
+		delete(unavailableDays, availability.Date)
 	}
 
 	if len(unavailableDays) != 0 {

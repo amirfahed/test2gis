@@ -19,7 +19,7 @@ func NewOrderRepository() *OrderRepository {
 
 func (orderRepo *OrderRepository) CreateOrders(ctx context.Context, orders []models.Order) error {
 	orderRepo.mu.Lock()
+	defer orderRepo.mu.Unlock()
 	orderRepo.orders = append(orderRepo.orders, orders...)
-	orderRepo.mu.Unlock()
 	return nil
 }
