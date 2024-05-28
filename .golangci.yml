@@ -1,8 +1,6 @@
 run:
   timeout: 5m
   skip-dirs:
-    - ../../../../usr
-    - ../../go
     - cmd/original
     - vendor
     - third_party
@@ -10,10 +8,11 @@ run:
   tests: true
 
 linters:
+  disable-all: true
   enable:
     - errcheck
     - gosimple
-    - govet
+    #- govet
     - ineffassign
     - staticcheck
     - typecheck

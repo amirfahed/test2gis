@@ -46,6 +46,11 @@ func (handler *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(newOrder)
+	if err != nil {
+		logger.LogErrorf("cant encode result")
+		http.Error(w, "Server error", http.StatusInternalServerError)
+		return
+	}
 
 	logger.LogInfo("Order successfully created: %v", newOrder)
 }

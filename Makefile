@@ -5,6 +5,8 @@ TEST_DIR = ./internal/service
 
 DEPS = github.com/go-chi/chi/v5
 
+GOLANGCI_TAG ?= 1.59.0
+
 # install dependency
 .PHONY: deps
 deps:
@@ -37,9 +39,9 @@ setup: deps build
 # install golangci-lint
 .PHONY: install-lint
 install-lint:
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin v1.51.2
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v$(GOLANGCI_TAG)
 
 # run linter
 .PHONY: lint
-lint:
+lint: install-lint
 	golangci-lint run
