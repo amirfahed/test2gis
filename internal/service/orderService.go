@@ -37,7 +37,7 @@ func (o *OrderService) CreateOrder(ctx context.Context, newOrder models.Order) (
 	var availabilityToUpdate []models.RoomAvailability
 
 	// optimization 2 for
-	for i, availability := range availabilities {
+	for _, availability := range availabilities {
 		_, ok := unavailableDays[availability.Date]
 		if !ok ||
 			availability.Quota < 1 ||
@@ -45,7 +45,7 @@ func (o *OrderService) CreateOrder(ctx context.Context, newOrder models.Order) (
 			availability.RoomID != newOrder.RoomID {
 			continue
 		}
-		availabilities[i].Quota -= 1
+		availability.Quota -= 1
 		availabilityToUpdate = append(availabilityToUpdate, availability)
 		delete(unavailableDays, availability.Date)
 	}
