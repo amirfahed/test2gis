@@ -33,3 +33,13 @@ clean:
 # install deps and build
 .PHONY: setup
 setup: deps build
+
+# install golangci-lint
+.PHONY: install-lint
+install-lint:
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin v1.51.2
+
+# run linter
+.PHONY: lint
+lint:
+	golangci-lint run
